@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">App Blocker</string>
+    <string name="accessibility_service_description">This service is used to block access to selected apps.</string>
+</resources>

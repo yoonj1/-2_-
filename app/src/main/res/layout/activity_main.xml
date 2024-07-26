@@ -1,0 +1,156 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#BAD061">
+
+    <!-- 상단 바 -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#BAD061"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/timerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Timer"
+            android:textSize="24sp"
+            android:textColor="#FCFCFC"
+            android:layout_centerVertical="true" />
+
+        <ImageView
+            android:id="@+id/settingsButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_more_vert"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/timerCircleContainer"
+        android:layout_width="252dp"
+        android:layout_height="252dp"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="-60dp"> <!-- 원형 부분을 올리기 위해 마진 조정 -->
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/circle_background"
+            android:indeterminate="false"
+            android:max="100"
+            android:progressDrawable="@drawable/circle_progress_bar" />
+
+        <EditText
+            android:id="@+id/timerText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="01:40"
+            android:textSize="64sp"
+            android:textColor="#4F9E1E"
+            android:layout_centerInParent="true"
+            android:inputType="time" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/controlContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/timerCircleContainer"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true">
+
+        <ImageView
+            android:id="@+id/btnDelete"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/delete"
+            android:background="@drawable/circle_border"
+            android:layout_marginEnd="16dp" />
+
+        <ImageView
+            android:id="@+id/btnPause"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/pause"
+            android:background="@drawable/circle_fill"
+            android:layout_marginEnd="16dp" />
+
+        <ImageView
+            android:id="@+id/btnReload"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/reload"
+            android:background="@drawable/circle_border" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/buttonContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/controlContainer"
+        android:layout_marginTop="16dp"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btnPomodoro40"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/button_background"
+            android:text="뽀모도로 40분"
+            android:textColor="@android:color/white"
+            android:padding="8dp"
+            android:backgroundTint="#FF6347" />
+
+        <Button
+            android:id="@+id/btnPomodoro50"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/button_background"
+            android:text="뽀모도로 50분"
+            android:textColor="@android:color/white"
+            android:padding="8dp"
+            android:backgroundTint="#4682B4" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/buttonContainer2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/buttonContainer"
+        android:layout_marginTop="16dp"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btnMathExam"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/button_background"
+            android:text="모의고사 수학"
+            android:textColor="@android:color/white"
+            android:padding="8dp"
+            android:backgroundTint="#32CD32" />
+
+        <Button
+            android:id="@+id/btnKoreanExam"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/button_background"
+            android:text="모의고사 국어"
+            android:textColor="@android:color/white"
+            android:padding="8dp"
+            android:backgroundTint="#FFD700" />
+    </LinearLayout>
+</RelativeLayout>
