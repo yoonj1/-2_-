@@ -3,6 +3,7 @@ package com.example.guru2_cleanspirit
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 
 fun Context.getInstalledApps(): List<AppInfo> {
     val pm: PackageManager = packageManager
@@ -12,7 +13,8 @@ fun Context.getInstalledApps(): List<AppInfo> {
     for (app in apps) {
         if (pm.getLaunchIntentForPackage(app.packageName) != null) {
             val appName = pm.getApplicationLabel(app).toString()
-            appList.add(AppInfo(appName, app.packageName))
+            val icon: Drawable = pm.getApplicationIcon(app.packageName)
+            appList.add(AppInfo(appName, app.packageName, icon))
         }
     }
     return appList

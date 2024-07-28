@@ -1,81 +1,67 @@
 package com.example.guru2_cleanspirit
 
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.widget.Button
-import android.widget.ImageView
+import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 class TimerActivity : AppCompatActivity() {
 
-    private lateinit var timerText: TextView
-    private lateinit var btnPomodoro40: Button
-    private lateinit var btnPomodoro50: Button
-    private lateinit var btnMathExam: Button
-    private lateinit var btnKoreanExam: Button
-    private lateinit var btnDelete: ImageView
-    private lateinit var btnPause: ImageView
-    private lateinit var btnReload: ImageView
-
-    private var countDownTimer: CountDownTimer? = null
+    private lateinit var timerText: EditText
+    private lateinit var progressBar: ProgressBar
+    private lateinit var timeLeftTextView: TextView
+    private lateinit var startButton: Button
+    private lateinit var pauseButton: Button
+    private lateinit var resetButton: Button
     private var timeLeftInMillis: Long = 0
+    private var initialTimeInMillis: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_timer)
 
         timerText = findViewById(R.id.timerText)
-        btnPomodoro40 = findViewById(R.id.btnPomodoro40)
-        btnPomodoro50 = findViewById(R.id.btnPomodoro50)
-        btnMathExam = findViewById(R.id.btnMathExam)
-        btnKoreanExam = findViewById(R.id.btnKoreanExam)
-        btnDelete = findViewById(R.id.btnDelete)
-        btnPause = findViewById(R.id.btnPause)
-        btnReload = findViewById(R.id.btnReload)
+        progressBar = findViewById(R.id.progressBar)
+        timeLeftTextView = findViewById(R.id.timeLeftTextView)
+        startButton = findViewById(R.id.startButton)
+        pauseButton = findViewById(R.id.pauseButton)
+        resetButton = findViewById(R.id.resetButton)
 
-        btnPomodoro40.setOnClickListener { startTimer(40 * 60 * 1000) }
-        btnPomodoro50.setOnClickListener { startTimer(50 * 60 * 1000) }
-        btnMathExam.setOnClickListener { startTimer(60 * 60 * 1000) }
-        btnKoreanExam.setOnClickListener { startTimer(60 * 60 * 1000) }
-        btnDelete.setOnClickListener { resetTimer() }
-        btnPause.setOnClickListener { pauseTimer() }
-        btnReload.setOnClickListener { reloadTimer() }
-    }
-
-    private fun startTimer(timeInMillis: Long) {
-        countDownTimer?.cancel()
-        timeLeftInMillis = timeInMillis
-        countDownTimer = object : CountDownTimer(timeInMillis, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                timeLeftInMillis = millisUntilFinished
-                updateTimerText()
-            }
-
-            override fun onFinish() {
-                // 타이머가 종료되었을 때의 동작을 정의합니다.
-            }
-        }.start()
-    }
-
-    private fun pauseTimer() {
-        countDownTimer?.cancel()
-    }
-
-    private fun resetTimer() {
-        countDownTimer?.cancel()
-        timeLeftInMillis = 0
+        // 전달받은 타이머 시간 설정
+        timeLeftInMillis = intent.getLongExtra("TIME_LEFT", 0)
+        initialTimeInMillis = intent.getLongExtra("INITIAL_TIME", 0)
         updateTimerText()
-    }
+        updateProgressBar()
 
-    private fun reloadTimer() {
-        startTimer(timeLeftInMillis)
+        // 버튼 클릭 리스너 설정
+        startButton.setOnClickListener { startTimer() }
+        pauseButton.setOnClickListener { pauseTimer() }
+        resetButton.setOnClickListener { resetTimer() }
     }
 
     private fun updateTimerText() {
         val minutes = (timeLeftInMillis / 1000) / 60
         val seconds = (timeLeftInMillis / 1000) % 60
         val timeFormatted = String.format("%02d:%02d", minutes, seconds)
-        timerText.text = timeFormatted
+        timerText.setText(timeFormatted)
+    }
+
+    private fun updateProgressBar() {
+        val progress = (timeLeftInMillis.toFloat() / initialTimeInMillis.toFloat()) * 100
+        progressBar.progress = progress.toInt()
+    }
+
+    private fun startTimer() {
+        // 타이머 시작 로직 추가
+    }
+
+    private fun pauseTimer() {
+        // 타이머 일시정지 로직 추가
+    }
+
+    private fun resetTimer() {
+        // 타이머 초기화 로직 추가
     }
 }

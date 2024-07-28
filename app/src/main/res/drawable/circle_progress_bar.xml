@@ -1,26 +1,30 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@android:id/background">
-        <bitmap
-            android:src="@drawable/circle_background"
-            android:tileMode="disabled" />
+        <shape android:shape="ring"
+            android:innerRadiusRatio="2.5"
+            android:thicknessRatio="20"
+            android:useLevel="false">
+            <solid android:color="#FFFFFF"/>
+        </shape>
+    </item>
+    <item android:id="@android:id/secondaryProgress">
+        <clip>
+            <shape android:shape="ring"
+                android:innerRadiusRatio="2.5"
+                android:thicknessRatio="20"
+                android:useLevel="true">
+                <solid android:color="#76C7C0"/>
+            </shape>
+        </clip>
     </item>
     <item android:id="@android:id/progress">
-        <rotate
-            android:fromDegrees="270"
-            android:toDegrees="270">
+        <clip>
             <shape android:shape="ring"
-                android:thicknessRatio="16"
+                android:innerRadiusRatio="2.4"
+                android:thicknessRatio="50"
                 android:useLevel="true">
-                <size android:width="200dp"
-                    android:height="200dp" />
-                <gradient
-                    android:type="sweep"
-                    android:useLevel="true"
-                    android:startColor="#76FF03"
-                    android:endColor="#76FF03"
-                    android:angle="0"
-                    android:gradientRadius="90" />
+                <solid android:color="#4F9E1D"/>
             </shape>
-        </rotate>
+        </clip>
     </item>
 </layer-list>

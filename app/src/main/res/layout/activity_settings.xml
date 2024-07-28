@@ -3,27 +3,53 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="#BAD162">
 
+    <!-- 상단 바 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:padding="8dp">
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
-        <Switch
-            android:id="@+id/switchService"
-            android:layout_width="0dp"
+        <!-- 홈으로 돌아가는 버튼 -->
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_weight="1"
-            android:text="Enable App Blocker"
-            android:minHeight="48dp" />
+            android:background="?attr/selectableItemBackground"
+            android:src="@drawable/arrow_back"
+            android:contentDescription="Back"
+            android:padding="12dp" />
+
+        <!-- 설정 제목 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Settings"
+            android:textSize="18sp"
+            android:layout_marginStart="16dp"
+            android:layout_gravity="center_vertical"/>
     </LinearLayout>
 
+    <!-- 한 칸 내린 Enable App Blocker -->
+    <Switch
+        android:id="@+id/switchService"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enable App Blocker"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
+        android:padding="8dp"
+        android:layout_marginTop="16dp"/>
+
+    <!-- 리사이클러 뷰 -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:layout_marginTop="16dp" />
 
 </LinearLayout>
