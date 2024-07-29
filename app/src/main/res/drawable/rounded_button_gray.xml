@@ -1,0 +1,4 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#F0F0F0"/>
+    <corners android:radius="12dp"/> <!-- 원하는 라운드 정도에 따라 radius 값을 수정하세요. -->
+</shape>

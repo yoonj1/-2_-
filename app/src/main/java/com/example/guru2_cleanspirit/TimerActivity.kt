@@ -39,8 +39,21 @@ class TimerActivity : AppCompatActivity() {
         startButton.setOnClickListener { startTimer() }
         pauseButton.setOnClickListener { pauseTimer() }
         resetButton.setOnClickListener { resetTimer() }
-    }
 
+        // 타이머 완료 시 아래 코드 추가
+        saveCurrentDate()
+    }
+    private fun saveCurrentDate() {
+        val sharedPreferences = getSharedPreferences("TimerPrefs", Context.MODE_PRIVATE)
+        val currentDate = Calendar.getInstance()
+        val dateString = "${currentDate.get(Calendar.YEAR)}-${currentDate.get(Calendar.MONTH) + 1}-${currentDate.get(Calendar.DAY_OF_MONTH)}"
+
+        val editor = sharedPreferences.edit()
+        val savedDates = sharedPreferences.getStringSet("dates", mutableSetOf()) ?: mutableSetOf()
+        savedDates.add(dateString)
+        editor.putStringSet("dates", savedDates)
+        editor.apply()
+    }
     private fun updateTimerText() {
         val minutes = (timeLeftInMillis / 1000) / 60
         val seconds = (timeLeftInMillis / 1000) % 60
