@@ -1,19 +1,24 @@
 package com.example.guru2_cleanspirit
 
-import android.Manifest
-import android.app.AlertDialog
 import android.app.admin.DevicePolicyManager
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.ServiceConnection
+import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.view.*
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.guru2_cleanspirit.src.DBHelper
 
 class MainActivity : AppCompatActivity() {
@@ -27,7 +32,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnDelete: ImageView
     private lateinit var pauseButton: ImageView
     private lateinit var btnReload: ImageView
-    private lateinit var settingsButton: ImageView
+    private lateinit var settingsButton: ImageButton
 
     private var timerService: TimerService? = null
     private var isServiceBound = false
@@ -39,11 +44,8 @@ class MainActivity : AppCompatActivity() {
     private val lockRunnable = Runnable { lockDevice() }
     private val REQUEST_CODE_DEVICE_ADMIN = 1
 
-    private lateinit var etUsername: EditText
-    private lateinit var etPassword: EditText
-    private lateinit var btnRegister: Button
-    private lateinit var btnLogin: Button
     private lateinit var dbHelper: DBHelper
+    private val currentUsername = "current_user"
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -65,65 +67,12 @@ class MainActivity : AppCompatActivity() {
             val timeLeft = intent.getLongExtra("timeLeft", 0)
             updateTimerText(timeLeft)
             updateProgressBar(timeLeft)
-            updateNotification(timeLeft)
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                1
-            )
-        }
-
-
-        etUsername = findViewById(R.id.etUsername)
-        etPassword = findViewById(R.id.etPassword)
-        btnRegister = findViewById(R.id.btnRegister)
-        btnLogin = findViewById(R.id.btnLogin)
-
-        dbHelper = DBHelper(this)
-
-        // 회원가입 버튼 클릭 시
-        btnRegister.setOnClickListener {
-            val username = etUsername.text.toString()
-            val password = etPassword.text.toString()
-
-            if (username.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
-            } else {
-                val result = dbHelper.insertUser(username, password)
-                if (result) {
-                    Toast.makeText(this, "Registration successful", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Registration failed", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-
-        // 로그인 버튼 클릭 시
-        btnLogin.setOnClickListener {
-            val username = etUsername.text.toString()
-            val password = etPassword.text.toString()
-
-            if (username.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
-            } else {
-                val result = dbHelper.checkUser(username, password)
-                if (result) {
-                    Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
-                    // 다음 화면으로 이동 (로그인 성공)
-                } else {
-                    Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-
 
         timeEditText = findViewById(R.id.timerText)
         progressBar = findViewById(R.id.progressBar)
@@ -136,27 +85,30 @@ class MainActivity : AppCompatActivity() {
         btnReload = findViewById(R.id.btnReload)
         settingsButton = findViewById(R.id.settingsButton)
 
-        val intent = Intent(this, TimerService::class.java)
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+        dbHelper = DBHelper(this)
+
+        settingsButton.setOnClickListener { view ->
+            showPopupMenu(view)
+        }
 
         btnPomodoro40.setOnClickListener {
-            startTimer(40 * 60 * 1000)
+            startTimer(40 * 60 * 1000L)
         }
 
         btnPomodoro50.setOnClickListener {
-            startTimer(50 * 60 * 1000)
+            startTimer(50 * 60 * 1000L)
         }
 
         btnMathExam.setOnClickListener {
-            startTimer(100 * 60 * 1000)
+            startTimer(60 * 60 * 1000L)
         }
 
         btnKoreanExam.setOnClickListener {
-            startTimer(80 * 60 * 1000)
+            startTimer(80 * 60 * 1000L)
         }
 
         btnDelete.setOnClickListener {
-            stopAndResetTimer()
+            resetTimer()
         }
 
         pauseButton.setOnClickListener {
@@ -171,22 +123,18 @@ class MainActivity : AppCompatActivity() {
             resetTimer()
         }
 
-        timeEditText.setOnClickListener {
-            showTimeInputDialog()
+        // Service binding
+        Intent(this, TimerService::class.java).also { intent ->
+            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
         }
 
-        settingsButton.setOnClickListener {
-            showPopupMenu(it)
-        }
-
-        updateTimerText(0)
-        updateProgressBar(0)
+        // 차단된 앱 목록 표시
+        showBlockedApps()
     }
 
     private fun showPopupMenu(view: View) {
         val popupMenu = PopupMenu(this, view)
-        val inflater: MenuInflater = popupMenu.menuInflater
-        inflater.inflate(R.menu.main_menu, popupMenu.menu)
+        popupMenu.menuInflater.inflate(R.menu.main_menu, popupMenu.menu)
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_settings -> {
@@ -205,130 +153,48 @@ class MainActivity : AppCompatActivity() {
         popupMenu.show()
     }
 
-    private fun showTimeInputDialog() {
-        val inflater = LayoutInflater.from(this)
-        val view = inflater.inflate(R.layout.dialog_time_input, null)
-        val minutesInput = view.findViewById<EditText>(R.id.minutesInput)
-        val secondsInput = view.findViewById<EditText>(R.id.secondsInput)
-
-        AlertDialog.Builder(this)
-            .setTitle("시간 설정")
-            .setView(view)
-            .setPositiveButton("확인") { dialogInterface: DialogInterface, i: Int ->
-                val minutes = minutesInput.text.toString().toIntOrNull() ?: 0
-                val seconds = secondsInput.text.toString().toIntOrNull() ?: 0
-                val timeInMillis = (minutes * 60 + seconds) * 1000L
-                startTimer(timeInMillis)
-            }
-            .setNegativeButton("취소", null)
-            .show()
-    }
-
     private fun startTimer(timeInMillis: Long) {
         initialTimeInMillis = timeInMillis
-        val intent = Intent(this, TimerService::class.java).apply {
-            putExtra("timeInMillis", timeInMillis)
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intent)
-        } else {
-            startService(intent)
-        }
+        updateNotification(timeInMillis)
         timerService?.startTimer(timeInMillis)
-        isTimerPaused = false
+        updateTimerText(timeInMillis)
+        updateProgressBar(timeInMillis)
     }
 
-    private fun stopAndResetTimer() {
-        timerService?.stopTimer()
+    private fun resetTimer() {
+        initialTimeInMillis = 0
         updateTimerText(0)
         updateProgressBar(0)
-        isTimerPaused = false
+        timerService?.resetTimer()
     }
 
     private fun pauseTimer() {
         timerService?.pauseTimer()
         isTimerPaused = true
+        pauseButton.setImageResource(R.drawable.pause) // Ensure pause icon is in res/drawable
     }
 
     private fun resumeTimer() {
         timerService?.resumeTimer()
         isTimerPaused = false
+        pauseButton.setImageResource(R.drawable.pause) // Ensure pause icon is in res/drawable
     }
 
-    private fun resetTimer() {
-        timerService?.resetTimer()
-        updateTimerText(initialTimeInMillis)
-        updateProgressBar(initialTimeInMillis)
-        isTimerPaused = false
-        startTimer(initialTimeInMillis)
+    private fun updateTimerText(timeLeft: Long) {
+        val minutes = (timeLeft / 1000) / 60
+        val seconds = (timeLeft / 1000) % 60
+        timeEditText.setText(String.format("%02d:%02d", minutes, seconds))
     }
 
-    private fun updateTimerText(timeLeftInMillis: Long) {
-        val minutes = (timeLeftInMillis / 1000) / 60
-        val seconds = (timeLeftInMillis / 1000) % 60
-        val timeFormatted = String.format("%02d:%02d", minutes, seconds)
-        timeEditText.setText(timeFormatted)
-    }
-
-    private fun updateProgressBar(timeLeftInMillis: Long) {
-        val progress = if (initialTimeInMillis > 0) {
-            (timeLeftInMillis.toFloat() / initialTimeInMillis.toFloat()) * 100
-        } else {
-            0f
-        }
-        progressBar.progress = progress.toInt()
+    private fun updateProgressBar(timeLeft: Long) {
+        progressBar.progress = ((timeLeft.toFloat() / initialTimeInMillis) * 100).toInt()
     }
 
     private fun lockDevice() {
         val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
         val componentName = ComponentName(this, MyDeviceAdminReceiver::class.java)
-
         if (dpm.isAdminActive(componentName)) {
-            // 디바이스 관리자로 활성화됨
-            try {
-                dpm.lockNow()
-            } catch (e: SecurityException) {
-                e.printStackTrace()
-                // 예외 처리: 사용자가 디바이스 관리자 권한을 활성화하지 않았을 경우
-                // 권한 요청 화면으로 이동
-                requestDeviceAdminPermission()
-            }
-        } else {
-            // 권한 요청 화면으로 이동
-            requestDeviceAdminPermission()
-        }
-    }
-
-    private fun requestDeviceAdminPermission() {
-        val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-        val componentName = ComponentName(this, MyDeviceAdminReceiver::class.java)
-
-        if (dpm.isAdminActive(componentName)) {
-            // 디바이스 관리자로 활성화됨
-            handler.postDelayed(lockRunnable, timeoutMs)
-        } else {
-            // 권한 요청 화면으로 이동
-            val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
-                putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName)
-                putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "이 앱은 설정한 시간 후에 자동으로 잠금화면으로 전환됩니다.")
-            }
-            startActivityForResult(intent, REQUEST_CODE_DEVICE_ADMIN)
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_DEVICE_ADMIN) {
-            val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-            val componentName = ComponentName(this, MyDeviceAdminReceiver::class.java)
-            if (dpm.isAdminActive(componentName)) {
-                // 권한이 허용됨
-                lockDevice()
-            } else {
-                // 권한이 허용되지 않음
-                // 사용자에게 권한이 필요하다는 메시지를 표시할 수 있습니다.
-                Toast.makeText(this, "디바이스 관리자 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
-            }
+            dpm.lockNow()
         }
     }
 
@@ -343,6 +209,57 @@ class MainActivity : AppCompatActivity() {
         if (isServiceBound) {
             unbindService(serviceConnection)
             isServiceBound = false
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_DEVICE_ADMIN) {
+            val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+            val componentName = ComponentName(this, MyDeviceAdminReceiver::class.java)
+            if (dpm.isAdminActive(componentName)) {
+                handler.postDelayed(lockRunnable, timeoutMs)
+            } else {
+                Toast.makeText(this, "디바이스 관리자 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun showBlockedApps() {
+        val blockedApps = dbHelper.getBlockedApps(currentUsername)
+        if (blockedApps.isEmpty()) {
+            Toast.makeText(this, "차단된 앱이 없습니다.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val blockedAppInfos = blockedApps.map { packageName ->
+            val appName = getAppName(packageName)
+            val icon = getAppIcon(packageName)
+            AppInfo(appName, packageName, icon)
+        }
+
+        val blockedAdapter = AppListAdapter(this, blockedAppInfos)
+        // 필요한 곳에 blockedAdapter를 설정합니다.
+        // 예를 들어, listView.adapter = blockedAdapter
+    }
+
+    private fun getAppName(packageName: String): String {
+        return try {
+            val pm = packageManager
+            val appInfo = pm.getApplicationInfo(packageName, 0)
+            pm.getApplicationLabel(appInfo).toString()
+        } catch (e: PackageManager.NameNotFoundException) {
+            packageName
+        }
+    }
+
+    private fun getAppIcon(packageName: String): Drawable {
+        return try {
+            val pm = packageManager
+            val appInfo = pm.getApplicationInfo(packageName, 0)
+            pm.getApplicationIcon(appInfo)
+        } catch (e: PackageManager.NameNotFoundException) {
+            ContextCompat.getDrawable(this, R.mipmap.ic_launcher) ?: error("Default icon not found")
         }
     }
 

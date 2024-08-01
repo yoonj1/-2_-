@@ -18,8 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity
-            android:name=".LoginActivity"
+        <activity android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,32 +26,25 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".MainActivity"
+        <activity android:name=".MainActivity"
             android:exported="true" />
 
-        <activity
-            android:name=".SettingsActivity"
+        <activity android:name=".SettingsActivity"
             android:exported="true" />
 
-        <activity
-            android:name=".TimerActivity"
+        <activity android:name=".TimerActivity"
             android:exported="true" />
 
-        <activity
-            android:name=".AppBlockedActivity"
+        <activity android:name=".AppBlockedActivity"
             android:exported="true" />
 
-        <activity
-            android:name=".LockActivity"
+        <activity android:name=".LockActivity"
             android:exported="true" />
 
-        <activity
-            android:name=".ui.PopupActivity"
+        <activity android:name=".ui.PopupActivity"
             android:exported="true" />
 
-        <service
-            android:name=".services.AppBlockerService"
+        <service android:name=".services.AppBlockerService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
             android:exported="true">
             <intent-filter>
@@ -63,33 +55,17 @@
                 android:resource="@xml/accessibility_service_config" />
         </service>
 
-        <service
-            android:name=".TimerService"
+        <service android:name=".TimerService"
             android:enabled="true"
             android:exported="true" />
 
-        <service
-            android:name=".MyForegroundService"
+        <service android:name=".MyForegroundService"
             android:enabled="true"
             android:exported="true" />
 
-        <receiver
-            android:name=".MyDeviceAdminReceiver"
+        <receiver android:name=".MyDeviceAdminReceiver"
             android:exported="true"
             android:permission="android.permission.BIND_DEVICE_ADMIN">
-            <meta-data
-                android:name="android.app.device_admin"
-                android:resource="@xml/device_admin_sample" />
-            <intent-filter>
-                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
-                <action android:name="android.app.action.DEVICE_ADMIN_DISABLED" />
-            </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name=".AdminReceiver"
-            android:permission="android.permission.BIND_DEVICE_ADMIN"
-            android:exported="true">
             <meta-data
                 android:name="android.app.device_admin"
                 android:resource="@xml/device_admin_sample" />

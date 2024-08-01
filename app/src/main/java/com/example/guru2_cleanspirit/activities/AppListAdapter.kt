@@ -19,12 +19,16 @@ class AppListAdapter(
         val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_app, parent, false)
         val appInfo = getItem(position)
 
+        // UI 요소를 찾습니다.
         val appNameTextView = view.findViewById<TextView>(R.id.app_name_text_view)
         val icon = view.findViewById<ImageView>(R.id.icon)
         val toggleSwitch = view.findViewById<Switch>(R.id.app_switch)
 
+        // 앱 정보를 설정합니다.
         appNameTextView.text = appInfo?.name
         icon.setImageDrawable(appInfo?.icon)
+
+        // 앱의 차단 상태를 설정합니다.
         toggleSwitch.isChecked = appInfo?.packageName?.let { isAppBlocked(it) } ?: false
         toggleSwitch.setOnCheckedChangeListener { _, isChecked ->
             appInfo?.packageName?.let { updateAppBlockStatus(it, isChecked) }

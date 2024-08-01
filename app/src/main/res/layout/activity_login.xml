@@ -3,6 +3,7 @@
     android:layout_height="match_parent"
     android:padding="16dp"
     android:background="#BAD162">
+
     <!-- 로그인 뷰 -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -10,10 +11,10 @@
         android:orientation="vertical"
         android:layout_centerInParent="true"
         android:padding="16dp"
-        android:background="@drawable/rounded_button_white"> <!-- 새로 만든 drawable을 사용 -->
+        android:background="@drawable/rounded_button_white">
 
         <EditText
-            android:id="@+id/etUsername"
+            android:id="@+id/editTextEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Email"
@@ -22,7 +23,7 @@
             android:layout_marginBottom="8dp" />
 
         <EditText
-            android:id="@+id/etPassword"
+            android:id="@+id/editTextPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Password"
@@ -37,14 +38,14 @@
             android:gravity="center">
 
             <Button
-                android:id="@+id/btnLogin"
+                android:id="@+id/buttonSignIn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Sign In"
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/rounded_button_gray"/>
             <Button
-                android:id="@+id/btnRegister"
+                android:id="@+id/buttonRegister"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Register"

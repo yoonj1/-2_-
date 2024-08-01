@@ -3,6 +3,7 @@ package com.example.guru2_cleanspirit
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
@@ -14,114 +15,115 @@ import androidx.core.app.NotificationCompat
 class TimerService : Service() {
 
     private val binder = TimerBinder()
-    private var countDownTimer: CountDownTimer? = null
+    private var timer: CountDownTimer? = null
     private var timeLeftInMillis: Long = 0
-    var initialTimeInMillis: Long = 0
-        private set
+    private var initialTimeInMillis: Long = 0
 
-    override fun onBind(intent: Intent): IBinder {
-        return binder
+    companion object {
+        const val CHANNEL_ID = "TimerServiceChannel"
     }
 
     inner class TimerBinder : Binder() {
         fun getService(): TimerService = this@TimerService
     }
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        val timeInMillis = intent.getLongExtra("timeInMillis", 0)
-        startForegroundService(timeInMillis)
-        return START_NOT_STICKY
+    override fun onCreate() {
+        super.onCreate()
+        createNotificationChannel()
+        startForeground(1, createNotification("Timer is running", "Time left: 00:00"))
     }
 
-    private fun startForegroundService(timeInMillis: Long) {
-        initialTimeInMillis = timeInMillis
-        timeLeftInMillis = timeInMillis
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        return START_STICKY
+    }
 
-        createNotificationChannel()
-
-        val notification = createNotification(timeInMillis)
-        startForeground(1, notification)
-
-        countDownTimer = object : CountDownTimer(timeInMillis, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                timeLeftInMillis = millisUntilFinished
-                updateNotification(millisUntilFinished)
-                val intent = Intent("TIMER_UPDATED").apply {
-                    putExtra("timeLeft", millisUntilFinished)
-                }
-                sendBroadcast(intent)
-            }
-
-            override fun onFinish() {
-                timeLeftInMillis = 0
-                updateNotification(timeLeftInMillis)
-                val intent = Intent("TIMER_UPDATED").apply {
-                    putExtra("timeLeft", timeLeftInMillis)
-                }
-                sendBroadcast(intent)
-                stopSelf()
-            }
-        }.start()
+    override fun onBind(intent: Intent?): IBinder {
+        return binder
     }
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val serviceChannel = NotificationChannel(
-                "TIMER_CHANNEL",
+                CHANNEL_ID,
                 "Timer Service Channel",
                 NotificationManager.IMPORTANCE_DEFAULT
             )
             val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(serviceChannel)
+            manager?.createNotificationChannel(serviceChannel)
         }
     }
 
-    private fun createNotification(timeInMillis: Long): Notification {
-        val minutes = (timeInMillis / 1000) / 60
-        val seconds = (timeInMillis / 1000) % 60
-        val timeFormatted = String.format("%02d:%02d", minutes, seconds)
-
-        return NotificationCompat.Builder(this, "TIMER_CHANNEL")
-            .setContentTitle("Timer Service")
-            .setContentText("Time left: $timeFormatted")
-            .setSmallIcon(R.drawable.ic_notification)
+    private fun createNotification(title: String, text: String): Notification {
+        val notificationIntent = Intent(this, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
+        return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle(title)
+            .setContentText(text)
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .setContentIntent(pendingIntent)
             .build()
     }
 
-    private fun updateNotification(timeLeftInMillis: Long) {
-        val minutes = (timeLeftInMillis / 1000) / 60
-        val seconds = (timeLeftInMillis / 1000) % 60
-        val timeFormatted = String.format("%02d:%02d", minutes, seconds)
-
-        val notification = createNotification(timeLeftInMillis)
-        val notificationManager = getSystemService(NotificationManager::class.java)
+    private fun updateNotification(text: String) {
+        val notification = createNotification("Timer Service", text)
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(1, notification)
     }
 
     fun startTimer(timeInMillis: Long) {
-        startForegroundService(timeInMillis)
+        initialTimeInMillis = timeInMillis
+        timer?.cancel()
+        timer = object : CountDownTimer(timeInMillis, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                timeLeftInMillis = millisUntilFinished
+                val minutes = (timeLeftInMillis / 1000) / 60
+                val seconds = (timeLeftInMillis / 1000) % 60
+                val timeFormatted = String.format("%02d:%02d", minutes, seconds)
+                updateNotification("Time left: $timeFormatted")
+
+                val intent = Intent("TIMER_UPDATED")
+                intent.putExtra("timeLeft", timeLeftInMillis)
+                sendBroadcast(intent)
+            }
+
+            override fun onFinish() {
+                timeLeftInMillis = 0
+                updateNotification("Time left: 00:00")
+
+                val intent = Intent("TIMER_UPDATED")
+                intent.putExtra("timeLeft", timeLeftInMillis)
+                sendBroadcast(intent)
+            }
+        }.start()
     }
 
     fun stopTimer() {
-        countDownTimer?.cancel()
-        stopForeground(true)
-        stopSelf()
+        timer?.cancel()
+        timeLeftInMillis = 0
+        updateNotification("Timer stopped")
+
+        val intent = Intent("TIMER_UPDATED")
+        intent.putExtra("timeLeft", timeLeftInMillis)
+        sendBroadcast(intent)
     }
 
     fun pauseTimer() {
-        countDownTimer?.cancel()
+        timer?.cancel()
     }
 
     fun resumeTimer() {
-        startForegroundService(timeLeftInMillis)
+        startTimer(timeLeftInMillis)
     }
 
     fun resetTimer() {
-        stopTimer()
-        timeLeftInMillis = 0
+        startTimer(initialTimeInMillis)
     }
 
     fun getTimeLeft(): Long {
         return timeLeftInMillis
+    }
+
+    fun getInitialTimeInMillis(): Long {
+        return initialTimeInMillis
     }
 }

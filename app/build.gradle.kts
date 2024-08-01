@@ -4,14 +4,16 @@ plugins {
     id("kotlin-parcelize") // Added for parcelize plugin
 }
 
+val kotlin_version = "1.5.31" // Move this to the top for visibility
+
 android {
-    namespace = "com.example.guru2_cleanspirit" // Add your application's namespace
-    compileSdkVersion(33)
+    namespace = "com.example.guru2_cleanspirit"
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "com.example.guru2_cleanspirit"
-        minSdkVersion(21)
-        targetSdkVersion(33)
+        minSdk = 21
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 
@@ -26,12 +28,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility(JavaVersion.VERSION_1_8)
-        targetCompatibility(JavaVersion.VERSION_1_8)
+        sourceCompatibility = JavaVersion.VERSION_17 // Updated for modern Java
+        targetCompatibility = JavaVersion.VERSION_17 // Updated for modern Java
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17" // Updated to match Java version
     }
 
     buildFeatures {
@@ -42,12 +44,10 @@ android {
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
     implementation("androidx.core:core-ktx:1.7.0")
-    implementation("androidx.appcompat:appcompat:1.4.0")
-    implementation("com.google.android.material:material:1.4.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.2")
+    implementation("androidx.appcompat:appcompat:1.4.1") // Updated to latest version
+    implementation("com.google.android.material:material:1.5.0") // Updated to latest version
+    implementation("androidx.constraintlayout:constraintlayout:2.1.3") // Updated to latest version
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 }
-
-val kotlin_version = "1.5.31"

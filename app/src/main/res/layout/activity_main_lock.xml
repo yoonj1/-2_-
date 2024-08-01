@@ -3,20 +3,34 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <EditText
-        android:id="@+id/timeEditText"
+    <LinearLayout
+        android:id="@+id/timeInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="시간(초)"
-        android:inputType="number"
-        android:padding="16dp"
-        android:layout_marginBottom="8dp" />
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <EditText
+            android:id="@+id/timerText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="시간을 입력하세요"
+            android:text="00:00"
+            android:inputType="none"
+            android:textSize="24sp"
+            android:background="@android:color/transparent"
+            android:padding="12dp"
+            android:gravity="center"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:onClick="showTimeInputDialog" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/startButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/timeEditText"
+        android:layout_below="@id/timeInputLayout"
         android:layout_marginTop="16dp"
         android:text="타이머 시작" />
 
@@ -31,7 +45,7 @@
         android:layout_marginBottom="8dp" />
 
     <TextView
-        android:id="@+id/timerText"
+        android:id="@+id/timerTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/lockToggle"
@@ -43,8 +57,7 @@
         android:id="@+id/progressBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/timerText"
+        android:layout_below="@id/timerTextView"
         android:layout_marginTop="16dp"
         style="?android:attr/progressBarStyleHorizontal" />
-
 </RelativeLayout>
