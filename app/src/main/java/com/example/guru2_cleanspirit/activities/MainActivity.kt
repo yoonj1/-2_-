@@ -14,6 +14,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
+import com.example.guru2_cleanspirit.src.DBHelper
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,6 +38,12 @@ class MainActivity : AppCompatActivity() {
     private var timeoutMs: Long = 30000 // 기본값 30초
     private val lockRunnable = Runnable { lockDevice() }
     private val REQUEST_CODE_DEVICE_ADMIN = 1
+
+    private lateinit var etUsername: EditText
+    private lateinit var etPassword: EditText
+    private lateinit var btnRegister: Button
+    private lateinit var btnLogin: Button
+    private lateinit var dbHelper: DBHelper
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -73,6 +80,50 @@ class MainActivity : AppCompatActivity() {
                 1
             )
         }
+
+
+        etUsername = findViewById(R.id.etUsername)
+        etPassword = findViewById(R.id.etPassword)
+        btnRegister = findViewById(R.id.btnRegister)
+        btnLogin = findViewById(R.id.btnLogin)
+
+        dbHelper = DBHelper(this)
+
+        // 회원가입 버튼 클릭 시
+        btnRegister.setOnClickListener {
+            val username = etUsername.text.toString()
+            val password = etPassword.text.toString()
+
+            if (username.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+            } else {
+                val result = dbHelper.insertUser(username, password)
+                if (result) {
+                    Toast.makeText(this, "Registration successful", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Registration failed", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        // 로그인 버튼 클릭 시
+        btnLogin.setOnClickListener {
+            val username = etUsername.text.toString()
+            val password = etPassword.text.toString()
+
+            if (username.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+            } else {
+                val result = dbHelper.checkUser(username, password)
+                if (result) {
+                    Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
+                    // 다음 화면으로 이동 (로그인 성공)
+                } else {
+                    Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
 
         timeEditText = findViewById(R.id.timerText)
         progressBar = findViewById(R.id.progressBar)

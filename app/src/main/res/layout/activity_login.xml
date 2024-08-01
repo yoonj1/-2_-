@@ -13,7 +13,7 @@
         android:background="@drawable/rounded_button_white"> <!-- 새로 만든 drawable을 사용 -->
 
         <EditText
-            android:id="@+id/editTextEmail"
+            android:id="@+id/etUsername"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Email"
@@ -22,7 +22,7 @@
             android:layout_marginBottom="8dp" />
 
         <EditText
-            android:id="@+id/editTextPassword"
+            android:id="@+id/etPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Password"
@@ -37,14 +37,14 @@
             android:gravity="center">
 
             <Button
-                android:id="@+id/buttonSignIn"
+                android:id="@+id/btnLogin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Sign In"
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/rounded_button_gray"/>
             <Button
-                android:id="@+id/buttonRegister"
+                android:id="@+id/btnRegister"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Register"
