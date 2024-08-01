@@ -36,7 +36,7 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, "환영합니다", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
-                finish() // 로그인 화면을 종료하여 뒤로가기 시 로그인 화면으로 돌아가지 않도록 함
+                finish()
             } else {
                 Toast.makeText(this, "사용자 정보가 없습니다", Toast.LENGTH_SHORT).show()
             }

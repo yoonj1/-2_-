@@ -10,9 +10,14 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
     }
+    plugins {
+        id("com.android.application") version "7.0.2"
+        id("org.jetbrains.kotlin.android") version "1.6.21"
+        id("org.jetbrains.kotlin.kapt") version "1.5.21"
+    }
 }
+
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
@@ -21,4 +26,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "GURU2_CleanSpirit"
 include(":app")
- 

@@ -1,4 +1,9 @@
 <resources>
-    <string name="app_name">CleanSpirits</string>
     <string name="accessibility_service_description">This service is used to block access to selected apps.</string>
+    <string name="app_name">GURU2 CleanSpirit</string>
+    <string name="lock_timer">Lock Timer</string>
+    <string name="default_timer">00:00:00</string>
+    <string name="start_timer">Start Timer</string>
+    <string name="screen_lock_timer">화면 잠금 타이머</string>
+
 </resources>

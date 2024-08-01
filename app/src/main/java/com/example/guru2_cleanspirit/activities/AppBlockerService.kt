@@ -1,4 +1,4 @@
-package com.example.guru2_cleanspirit
+package com.example.guru2_cleanspirit.services
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
@@ -16,6 +16,10 @@ import android.os.Looper
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import androidx.core.app.NotificationCompat
+import com.example.guru2_cleanspirit.AppBlockedActivity
+import com.example.guru2_cleanspirit.MainActivity
+import com.example.guru2_cleanspirit.R
+import com.example.guru2_cleanspirit.RestartServiceReceiver
 import java.util.concurrent.Executors
 
 class AppBlockerService : AccessibilityService() {
