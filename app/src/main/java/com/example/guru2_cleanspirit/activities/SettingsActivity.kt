@@ -3,6 +3,7 @@ package com.example.guru2_cleanspirit
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.provider.Settings
 import android.text.TextUtils
@@ -12,12 +13,17 @@ import android.widget.ListView
 import android.widget.Switch
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.guru2_cleanspirit.src.DBHelper
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var listView: ListView
     private lateinit var backButton: ImageButton
     private lateinit var switchService: Switch
+    private lateinit var dbHelper: DBHelper
+
+    // 현재 로그인한 사용자 이름 (예제에서는 하드코딩, 실제로는 로그인 세션 등에서 가져와야 함)
+    private val currentUsername = "current_user"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +32,9 @@ class SettingsActivity : AppCompatActivity() {
         listView = findViewById(R.id.listView)
         backButton = findViewById(R.id.btnBack)
         switchService = findViewById(R.id.switchService)
+
+        // DBHelper 인스턴스 생성
+        dbHelper = DBHelper(this)
 
         // 뒤로 가기 버튼 클릭 리스너 설정
         backButton.setOnClickListener {
@@ -53,6 +62,9 @@ class SettingsActivity : AppCompatActivity() {
         // 어댑터 초기화
         val adapter = AppListAdapter(this, appList)
         listView.adapter = adapter
+
+        // 차단된 앱 목록 가져오기
+        showBlockedApps()
     }
 
     override fun onResume() {
@@ -90,5 +102,47 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         return appList
+    }
+
+    // 차단된 앱 목록 가져오기
+    private fun showBlockedApps() {
+        val blockedApps = dbHelper.getBlockedApps(currentUsername)
+
+        if (blockedApps.isEmpty()) {
+            Toast.makeText(this, "차단된 앱이 없습니다.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val blockedAppInfos = blockedApps.map { packageName ->
+            val appName = getAppName(packageName)
+            val icon = getAppIcon(packageName)
+            AppInfo(appName, packageName, icon)
+        }
+
+        // 차단된 앱 어댑터 초기화
+        val blockedAdapter = AppListAdapter(this, blockedAppInfos)
+        listView.adapter = blockedAdapter
+    }
+
+    // 앱 이름 가져오기
+    private fun getAppName(packageName: String): String {
+        return try {
+            val pm = packageManager
+            val appInfo = pm.getApplicationInfo(packageName, 0)
+            pm.getApplicationLabel(appInfo).toString()
+        } catch (e: PackageManager.NameNotFoundException) {
+            packageName
+        }
+    }
+
+    // 앱 아이콘 가져오기
+    private fun getAppIcon(packageName: String): Drawable {
+        return try {
+            val pm = packageManager
+            val appInfo = pm.getApplicationInfo(packageName, 0)
+            pm.getApplicationIcon(appInfo)
+        } catch (e: PackageManager.NameNotFoundException) {
+            getDrawable(R.mipmap.ic_launcher) ?: error("Default icon not found")
+        }
     }
 }

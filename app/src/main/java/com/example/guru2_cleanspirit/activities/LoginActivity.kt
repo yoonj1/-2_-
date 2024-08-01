@@ -19,10 +19,10 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        editTextEmail = findViewById(R.id.editTextEmail)
-        editTextPassword = findViewById(R.id.editTextPassword)
-        buttonSignIn = findViewById(R.id.buttonSignIn)
-        buttonRegister = findViewById(R.id.buttonRegister)
+        editTextEmail = findViewById(R.id.etUsername)
+        editTextPassword = findViewById(R.id.etPassword)
+        buttonSignIn = findViewById(R.id.btnLogin)
+        buttonRegister = findViewById(R.id.btnRegister)
 
         val sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE)
 
